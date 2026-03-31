@@ -36,7 +36,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
     <div className="login-page">
       <header className="header">
         <div className="header-container">
-          <span className="logo-text">Flagship</span>
+          <span className="logo-text">RWA // NEXUS</span>
           <a href="/" className="nav-link">Back to Home</a>
         </div>
       </header>

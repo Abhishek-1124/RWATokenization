@@ -172,7 +172,7 @@ const Issuer: React.FC = () => {
     <div className="issuer-page">
       <header className="issuer-header">
         <div className="container issuer-header-inner">
-          <span className="issuer-logo">Flagship</span>
+          <span className="issuer-logo">RWA // NEXUS</span>
           <nav className="issuer-nav">
             <Link to="/" className="issuer-link">Home</Link>
             <Link to="/marketplace" className="issuer-link">Marketplace</Link>

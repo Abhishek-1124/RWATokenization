@@ -104,9 +104,10 @@ export type ContractAddresses = {
 
 export const DEFAULT_CONTRACT_ADDRESSES: ContractAddresses = {
   admin: ADMIN_CONTRACT_ADDRESS,
-  assetRegistry: "",
-  fractionalToken: "",
-  marketplace: "",
+  // Sourced from broadcast/Deploy.s.sol/296/run-latest.json
+  assetRegistry: "0x1b566e6a1b1f2be91fc1348172df827c5f508df8",
+  fractionalToken: "0xf5af04d4ccc5da542f5cd893b566f82410d06afe",
+  marketplace: "0xf5312c4a8353a66ef7dd48322c95bf14874035c9",
   incomeDistributor: "",
   htsAdapter: "",
 };

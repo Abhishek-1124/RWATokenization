@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ADMIN_CONTRACT_ADDRESS } from '../../config/contracts';
+import { ADMIN_CONTRACT_ADDRESS, DEFAULT_CONTRACT_ADDRESSES } from '../../config/contracts';
 import { useContractAddresses } from '../../hooks/useContractAddresses';
 import './ContractAddresses.css';
 
@@ -43,11 +43,11 @@ export const ContractAddresses: React.FC = () => {
 
   const handleReset = () => {
     resetAddresses();
-    setAssetRegistry('');
-    setFractionalToken('');
-    setMarketplace('');
-    setIncomeDistributor('');
-    setHtsAdapter('');
+    setAssetRegistry(DEFAULT_CONTRACT_ADDRESSES.assetRegistry);
+    setFractionalToken(DEFAULT_CONTRACT_ADDRESSES.fractionalToken);
+    setMarketplace(DEFAULT_CONTRACT_ADDRESSES.marketplace);
+    setIncomeDistributor(DEFAULT_CONTRACT_ADDRESSES.incomeDistributor);
+    setHtsAdapter(DEFAULT_CONTRACT_ADDRESSES.htsAdapter);
     setMessage({ type: 'success', text: 'Reset to defaults.' });
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '../../context/Web3Context';
 import { useAuth } from '../../context/AuthContext';
 import { useAdminContract } from '../../hooks/useAdminContract';
@@ -10,7 +10,7 @@ import './AdminDashboard.css';
 const AdminDashboard: React.FC = () => {
   const { address, isConnected, chainId, connectWallet, disconnectWallet, switchToHederaTestnet } = useWallet();
   const { logout } = useAuth();
-  const { getOwner, getMarketplacePaused, pauseMarketplace } = useAdminContract();
+  const { getOwner, getMarketplacePaused, pauseMarketplace, transferOwnership } = useAdminContract();
 
   const [owner, setOwner] = useState<string | null>(null);
   const [isOwner, setIsOwner] = useState(false);
@@ -18,23 +18,26 @@ const AdminDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
 
+  const refreshContractData = useCallback(async () => {
+    if (!isConnected) {
+      setOwner(null);
+      setIsOwner(false);
+      setMarketplacePaused(false);
+      return;
+    }
+
+    const ownerAddress = await getOwner();
+    setOwner(ownerAddress);
+    setIsOwner(address?.toLowerCase() === ownerAddress?.toLowerCase());
+
+    const paused = await getMarketplacePaused();
+    setMarketplacePaused(paused);
+  }, [isConnected, address, getOwner, getMarketplacePaused]);
+
   // Fetch contract data
   useEffect(() => {
-    const fetchData = async () => {
-      if (isConnected) {
-        const ownerAddress = await getOwner();
-        console.log('Contract Owner:', ownerAddress);
-        console.log('Connected Address:', address);
-        console.log('Addresses match:', address?.toLowerCase() === ownerAddress?.toLowerCase());
-        setOwner(ownerAddress);
-        setIsOwner(address?.toLowerCase() === ownerAddress?.toLowerCase());
-
-        const paused = await getMarketplacePaused();
-        setMarketplacePaused(paused);
-      }
-    };
-    fetchData();
-  }, [isConnected, address]);
+    refreshContractData();
+  }, [refreshContractData]);
 
   const handlePauseToggle = async () => {
     setIsLoading(true);
@@ -44,7 +47,7 @@ const AdminDashboard: React.FC = () => {
       setMarketplacePaused(!marketplacePaused);
       setStatusMessage({
         type: 'success',
-        text: `Marketplace ${!marketplacePaused ? 'paused' : 'resumed'} successfully`
+        text: `Marketplace ${marketplacePaused ? 'resumed' : 'paused'} successfully`
       });
     } catch (error) {
       setStatusMessage({
@@ -67,7 +70,7 @@ const AdminDashboard: React.FC = () => {
     <div className="dashboard-page">
       <header className="header">
         <div className="header-container">
-          <span className="logo-text">Flagship</span>
+          <span className="logo-text">RWA // NEXUS</span>
           <div className="header-actions">
             <a href="/" className="nav-link">Home</a>
             <button onClick={handleLogout} className="logout-button">
@@ -182,6 +185,7 @@ const AdminDashboard: React.FC = () => {
             <div className="role-management-section">
               <IssuerManagement isOwner={isOwner} />
               <ManagerManagement isOwner={isOwner} />
+              <OwnerTransferCard isOwner={isOwner} currentOwner={owner} onOwnerUpdated={refreshContractData} transferOwnership={transferOwnership} />
 
               {/* Token-Specific Manager Card */}
               <TokenManagerCard isOwner={isOwner} />
@@ -205,6 +209,89 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </footer>
+    </div>
+  );
+};
+
+const isProbablyAddress = (value: string) => /^0x[a-fA-F0-9]{40}$/.test(value.trim());
+
+type OwnerTransferCardProps = {
+  isOwner: boolean;
+  currentOwner: string | null;
+  onOwnerUpdated: () => Promise<void>;
+  transferOwnership: (newOwner: string) => Promise<boolean>;
+};
+
+const OwnerTransferCard: React.FC<OwnerTransferCardProps> = ({ isOwner, currentOwner, onOwnerUpdated, transferOwnership }) => {
+  const [newOwner, setNewOwner] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+
+  const handleTransfer = async () => {
+    setMessage(null);
+
+    if (!isProbablyAddress(newOwner)) {
+      setMessage({ type: 'error', text: 'Enter a valid EVM address (0x...).' });
+      return;
+    }
+
+    if (currentOwner && currentOwner.toLowerCase() === newOwner.trim().toLowerCase()) {
+      setMessage({ type: 'error', text: 'New owner cannot be the same as current owner.' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await transferOwnership(newOwner.trim());
+      await onOwnerUpdated();
+      setMessage({ type: 'success', text: 'Ownership transferred successfully.' });
+      setNewOwner('');
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to transfer ownership.' });
+    }
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="dashboard-card full-width">
+      <h3 className="card-title">Owner Management</h3>
+
+      {message && (
+        <div className={`card-message ${message.type}`}>{message.text}</div>
+      )}
+
+      <div className="owner-transfer-form">
+        <p className="owner-help">
+          Transfer contract ownership to a new wallet. This is a critical action and only the current owner can do it.
+        </p>
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">New Owner Address</label>
+            <input
+              type="text"
+              value={newOwner}
+              onChange={(e) => setNewOwner(e.target.value)}
+              placeholder="0x..."
+              className="form-input"
+              disabled={isLoading}
+            />
+          </div>
+        </div>
+
+        <div className="button-row">
+          <button
+            onClick={handleTransfer}
+            className="action-btn assign"
+            disabled={!isOwner || isLoading || !newOwner}
+          >
+            {isLoading ? 'Transferring...' : 'Transfer Ownership'}
+          </button>
+        </div>
+      </div>
+
+      {!isOwner && (
+        <p className="warning-text">Only the current owner can transfer ownership</p>
+      )}
     </div>
   );
 };

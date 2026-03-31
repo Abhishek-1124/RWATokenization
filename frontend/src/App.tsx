@@ -6,6 +6,9 @@ import Admin from './pages/Admin/Admin';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Issuer from './pages/Issuer/Issuer';
 import Marketplace from './pages/Marketplace/Marketplace';
+import Assets from './pages/Assets/Assets';
+import Transactions from './pages/Transactions/Transactions';
+import Settings from './pages/Settings/Settings';
 
 function App() {
   return (
@@ -15,10 +18,12 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/assets" element={<Assets />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/issuer" element={<Issuer />} />
-            <Route path="/marketplace" element={<Marketplace />} />
           </Routes>
         </AuthProvider>
       </WalletProvider>

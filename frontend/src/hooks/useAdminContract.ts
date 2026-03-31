@@ -150,6 +150,19 @@ export function useAdminContract() {
     }
   };
 
+  const transferOwnership = async (newOwner: string): Promise<boolean> => {
+    const contract = getWriteContract();
+    if (!contract) throw new Error('Wallet not connected');
+    try {
+      const tx = await contract.transferOwnership(newOwner);
+      await tx.wait();
+      return true;
+    } catch (error) {
+      console.error('Error transferring ownership:', error);
+      throw error;
+    }
+  };
+
   return {
     // Read functions
     getOwner,
@@ -164,5 +177,6 @@ export function useAdminContract() {
     removeManager,
     setManagerForToken,
     pauseMarketplace,
+    transferOwnership,
   };
 }

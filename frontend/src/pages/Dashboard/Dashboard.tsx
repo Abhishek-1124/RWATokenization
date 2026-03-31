@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
       <header className="header">
         <div className="header-container">
           <div className="logo">
-            <span className="logo-text">Flagship Designer</span>
+            <span className="logo-text">RWA // NEXUS</span>
           </div>
           <nav className="nav">
             <a href="/" className="nav-link">Home</a>
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
                 <div className="feature-card">
                   <h3>Your Assets</h3>
                   <p>View and manage your fractional ownership tokens</p>
-                  <button className="feature-btn">View Assets</button>
+                  <button className="feature-btn" onClick={() => navigate('/assets')}>View Assets</button>
                 </div>
 
                 <div className="feature-card">
@@ -82,13 +82,13 @@ const Dashboard: React.FC = () => {
                 <div className="feature-card">
                   <h3>Transactions</h3>
                   <p>View your transaction history</p>
-                  <button className="feature-btn">View History</button>
+                  <button className="feature-btn" onClick={() => navigate('/transactions')}>View History</button>
                 </div>
 
                 <div className="feature-card">
                   <h3>Settings</h3>
                   <p>Manage your account preferences</p>
-                  <button className="feature-btn">Open Settings</button>
+                  <button className="feature-btn" onClick={() => navigate('/settings')}>Open Settings</button>
                 </div>
               </div>
             </div>

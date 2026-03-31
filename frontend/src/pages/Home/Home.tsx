@@ -98,7 +98,7 @@ const Home: React.FC = () => {
       <header className="header">
         <div className="header-container">
           <div className="logo">
-            <span className="logo-text">Flagship Designer</span>
+            <span className="logo-text">RWA // NEXUS</span>
           </div>
           <nav className="nav">
             <a href="/dashboard" className="nav-link dashboard-link">Dashboard</a>
